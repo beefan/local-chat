@@ -1,11 +1,12 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head } from '@inertiajs/vue3';
-import { ref, defineProps } from 'vue';
+import { ref } from 'vue';
 import { router } from '@inertiajs/vue3'
+import { watch } from 'vue';
 
 const props = defineProps({
-  chatMessage: {
+  systemResponse: {
     type: String,
   }
 });
@@ -15,22 +16,21 @@ const chatContextLookback = 10;
 const newMessage = ref('');
 const messages = ref([
   {
-    text: 'What do you want to chat about?',
-    sender: 'chat'
-  },
-  {
-    text: 'I want to chat about the weather',
-    sender: 'user'
+    content: 'What do you want to chat about?',
+    role: 'assistant'
   }
 ]);
 
 const sendMessage = () => {
-  messages.value.push({ text: newMessage.value, sender: 'user' });
+  messages.value.push({ content: newMessage.value, role: 'user' });
   newMessage.value = "";
 
   router.post('/chat', { messages: messages.value.slice(-chatContextLookback) });
-  messages.value.push({ text: props.chatMessage, sender: 'chat' });
 }
+
+watch(() => props.systemResponse, () => {
+  messages.value.push({ content: props.systemResponse, role: 'assistant' });
+});
 </script>
 
 <template>
@@ -43,10 +43,10 @@ const sendMessage = () => {
           <div class="flex flex-col h-[calc(100vh-150px)] bg-gray-200">
             <div class="flex-1 p-4 overflow-y-auto space-y-4">
               <div v-for="message in messages">
-                <div :class="'flex ' + (message.sender == 'user' ? 'justify-end' : 'justify-start')">
+                <div :class="'flex ' + (message.role == 'user' ? 'justify-end' : 'justify-start')">
                   <div
-                    :class="'p-3 rounded-lg max-w-xs ' + (message.sender == 'user' ? 'bg-purple-500 text-white' : 'bg-gray-300 text-black')">
-                    <p>{{ message.text }}</p>
+                    :class="'p-3 rounded-lg max-w-xs ' + (message.role == 'user' ? 'bg-purple-500 text-white' : 'bg-gray-300 text-black')">
+                    <p>{{ message.content }}</p>
                   </div>
                 </div>
               </div>
