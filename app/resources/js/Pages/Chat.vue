@@ -1,5 +1,6 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import Markdown from '@/Components/Markdown.vue';
 import { Head } from '@inertiajs/vue3';
 import { ref } from 'vue';
 import { router } from '@inertiajs/vue3'
@@ -46,7 +47,7 @@ watch(() => props.systemResponse, () => {
                 <div :class="'flex ' + (message.role == 'user' ? 'justify-end' : 'justify-start')">
                   <div
                     :class="'p-3 rounded-lg max-w-xs ' + (message.role == 'user' ? 'bg-purple-500 text-white' : 'bg-gray-300 text-black')">
-                    <p>{{ message.content }}</p>
+                    <Markdown :content="message.content" />
                   </div>
                 </div>
               </div>
