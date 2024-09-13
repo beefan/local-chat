@@ -4,7 +4,7 @@ import Markdown from '@/Components/Markdown.vue';
 import { Head } from '@inertiajs/vue3';
 import { ref } from 'vue';
 import { router } from '@inertiajs/vue3'
-import { watch } from 'vue';
+import { watch, useTemplateRef, computed } from 'vue';
 
 const props = defineProps({
   systemResponse: {
@@ -14,6 +14,7 @@ const props = defineProps({
 
 const chatContextLookback = 10;
 
+const textAreaRef = useTemplateRef('textareaRef');
 const newMessage = ref('');
 const messages = ref([
   {
@@ -27,7 +28,17 @@ const sendMessage = () => {
   newMessage.value = "";
 
   router.post('/chat', { messages: messages.value.slice(-chatContextLookback) });
+  textAreaRef.value.style.height = 'auto'; // Reset height after sending message
 }
+
+const autoGrow = () => {
+  textAreaRef.value.style.height = 'auto';
+  textAreaRef.value.style.height = textAreaRef.value.scrollHeight + 'px';
+}
+
+const sendDisabled = computed(() => {
+  return newMessage.value.trim().length < 1;
+});
 
 watch(() => props.systemResponse, () => {
   messages.value.push({ content: props.systemResponse, role: 'assistant' });
@@ -54,10 +65,10 @@ watch(() => props.systemResponse, () => {
             </div>
 
             <div class="p-4 bg-white flex items-center space-x-4">
-              <input v-model="newMessage" @keyup.enter="sendMessage" type="text" placeholder="Type your message..."
-                class="flex-1 p-2 border border-gray-300 rounded-lg" />
+              <textarea ref="textareaRef" v-model="newMessage" @keyup="autoGrow" @keyup.enter="sendMessage" placeholder="Type your message..."
+                class="flex-1 p-2 border border-gray-300 rounded-lg resize-none h-16"></textarea>
               <button @click="sendMessage" class="bg-blue-500 text-white px-4 py-2 rounded-lg disabled:bg-gray-300"
-                :disabled="newMessage.trim().length < 1">
+                :disabled="sendDisabled">
                 Send
               </button>
             </div>
@@ -67,4 +78,3 @@ watch(() => props.systemResponse, () => {
     </div>
   </AuthenticatedLayout>
 </template>
-
