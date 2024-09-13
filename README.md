@@ -40,17 +40,11 @@ inside the app directory run `composer install`. It may be necessary to also run
 Once up, run `./vendor/bin/sail artisan migrate` to run initial migrations
 
 ### npm run dev
-It's an Inertia.js project which requires a vite server running to render the frontend. Run a shell to the docker container and initialize the vite server. 
+It's an Inertia.js project which requires a frontend resources to be built to render the ui properly. Run a shell to the docker container and build the frontend resources:
 ```
 sudo docker exec -it app-laravel.test-1 bash
 
 npm run build
-npm run dev
 ```
 
-to expose to the rest of your network, use the `--host` option:
-```
-npm run dev --host your.server.ip.here
-```
-
-You can then access the site using the servers host name or ip from an device in the network. 
+You can then access the site using the servers host name or ip from a device in the network. 
