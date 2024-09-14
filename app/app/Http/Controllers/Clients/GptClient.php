@@ -9,6 +9,10 @@ class GptClient implements ChatClientContract
 {
   public function chat(array $messages): string
   {
+    if (config('openai.testMode')) {
+      Log::debug('GptClient#chat - test mode enabled');
+      return 'mock gpt response';
+    }
 
     $response = Http::timeout(config('openai.responseTimeoutSeconds'))
       ->connectTimeout(config('openai.connectionTimeoutSeconds'))
