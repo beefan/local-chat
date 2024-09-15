@@ -91,6 +91,11 @@ const showingNavigationDropdown = ref(false);
                             Chat
                         </ResponsiveNavLink>
                     </div>
+                    <div class="pt-2 pb-3 space-y-1">
+                        <ResponsiveNavLink :href="route('chat.history')" :active="route().current('chat.history')">
+                            Chat History
+                        </ResponsiveNavLink>
+                    </div>
 
                     <!-- Responsive Settings Options -->
                     <div class="pt-4 pb-1 border-t border-gray-200">
