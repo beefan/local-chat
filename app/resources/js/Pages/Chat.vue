@@ -50,6 +50,10 @@ const sendMessage = async () => {
   const userMessage = { content: newMessage.value, role: 'user' };
   messages.value.push(userMessage);
 
+  newMessage.value = '';
+  textAreaRef.value.style.height = 'auto';
+
+  await nextTick();
   scrollToBottom();
 
   const response = await axios.post('/chat', { 
@@ -63,13 +67,9 @@ const sendMessage = async () => {
   }
   chatId.value = response.data.chat.id;
   chatTitle.value = response.data.chat.title;
-
-  newMessage.value = '';
-  textAreaRef.value.style.height = 'auto';
   
-  nextTick(() => {
-    scrollToBottom();
-  });
+  await nextTick();
+  scrollToBottom();
   
   sendLoading.value = false;
 };
@@ -136,7 +136,8 @@ onMounted(() => {
             <div class="p-4 bg-white flex items-center space-x-2">
               <textarea ref="textareaRef" v-model="newMessage" @keyup="autoGrow" @keyup.enter="sendMessage" placeholder="Type your message..."
                 class="flex-1 p-2 border border-gray-300 rounded-lg resize-none h-16"></textarea>
-              <button @click="sendMessage" class="bg-blue-500 text-white px-4 py-2 rounded-lg disabled:bg-gray-300"
+              <div v-if="sendLoading" class="animate-spin rounded-full h-8 w-8 border-t-4 border-b-4 border-purple-500"></div>
+              <button v-else @click="sendMessage" class="bg-blue-500 text-white px-4 py-2 rounded-lg disabled:bg-gray-300"
                 :disabled="sendDisabled">
                 Send
               </button>
