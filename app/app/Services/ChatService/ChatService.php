@@ -18,12 +18,10 @@ class ChatService implements ChatServiceContract
     $chat = $chatId ? $this->getChat($chatId) : null;
     $saveMessages = $messages;
 
-    if ($systemPrompt) {
-      array_unshift($messages, [
-        'role' => 'system',
-        'content' => $systemPrompt,
-      ]);
-    }
+    array_unshift($messages, [
+      'role' => 'system',
+      'content' => $systemPrompt ?? config('chat.defaultSystemPrompt'),
+    ]);
 
     if ($chat) {
       $summaryMessages = $chat->summary ? [
