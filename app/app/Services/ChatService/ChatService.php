@@ -26,7 +26,13 @@ class ChatService implements ChatServiceContract
     }
 
     if ($chat) {
-      $messages = array_merge($chat->lastMessages(), $messages);
+      $summaryMessages = $chat->summary ? [
+        [
+          'role' => 'user',
+          'content' => 'For context, here is a summary of our conversations up to this point: ' . $chat->summary,
+        ]
+      ] : [];
+      $messages = array_merge($summaryMessages, $chat->lastMessages(), $messages);
     }
 
     $response = $this->chatClient->chat($messages);
@@ -95,7 +101,13 @@ class ChatService implements ChatServiceContract
       $systemPrompt = config('chat.summarizeSystemPrompt');
     }
 
-    $summary = $this->chat(messages: ['content' => $messages, 'role' => 'user'], systemPrompt: $systemPrompt)->systemResponse;
+    $query = [
+      [
+        'content' => $messages,
+        'role' => 'user'
+      ]
+    ];
+    $summary = $this->chat(messages: $query, systemPrompt: $systemPrompt)->systemResponse;
 
     $chat->summary = $summary;
     $chat->last_summarized_message_count = $currentMessageCount;

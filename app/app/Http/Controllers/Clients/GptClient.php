@@ -10,7 +10,9 @@ class GptClient implements ChatClientContract
   public function chat(array $messages): string
   {
     if (config('openai.testMode')) {
-      Log::debug('GptClient#chat - test mode enabled');
+      Log::debug('GptClient#chat - test mode enabled', [
+        'messages' => $messages,
+      ]);
       return 'mock gpt response';
     }
 
