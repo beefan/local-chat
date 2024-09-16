@@ -136,7 +136,8 @@ onMounted(() => {
             <div class="p-4 bg-white flex items-center space-x-2">
               <textarea ref="textareaRef" v-model="newMessage" @keyup="autoGrow" @keyup.enter="sendMessage" placeholder="Type your message..."
                 class="flex-1 p-2 border border-gray-300 rounded-lg resize-none h-16"></textarea>
-              <button @click="sendMessage" class="bg-blue-500 text-white px-4 py-2 rounded-lg disabled:bg-gray-300"
+              <div v-if="sendLoading" class="animate-spin rounded-full h-8 w-8 border-t-4 border-b-4 border-purple-500"></div>
+              <button v-else @click="sendMessage" class="bg-blue-500 text-white px-4 py-2 rounded-lg disabled:bg-gray-300"
                 :disabled="sendDisabled">
                 Send
               </button>
