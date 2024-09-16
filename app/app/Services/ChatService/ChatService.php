@@ -3,6 +3,7 @@
 namespace App\Services\ChatService;
 
 use App\Http\Controllers\Clients\ChatClientContract;
+use App\Jobs\SummarizeChat;
 use App\Models\Chat;
 use App\Models\User;
 
@@ -68,12 +69,42 @@ class ChatService implements ChatServiceContract
 
     $chat->messages()->createMany($messages);
 
+    SummarizeChat::dispatch($chat);
+
     return $chat;
   }
 
   public function getChat(int $id): ?Chat
   {
     return Chat::find($id);
+  }
+
+  public function summarizeChat(Chat $chat): void
+  {
+    $currentMessageCount = $chat->messages()->count();
+    $newMessageCount = $currentMessageCount - ($chat->last_summarized_message_count ?? 0);
+    if ($newMessageCount < config('chat.summarizeChatThreshold')) {
+      return;
+    }
+
+    $messages = $this->formatMessagesForSummary($chat->lastMessages($newMessageCount));
+
+    if ($chat->summary) {
+      $systemPrompt = config('chat.reSummarizeSystemPrompt') . "\nPrevious Summary: " . $chat->summary;
+    } else {
+      $systemPrompt = config('chat.summarizeSystemPrompt');
+    }
+
+    $summary = $this->chat(messages: ['content' => $messages, 'role' => 'user'], systemPrompt: $systemPrompt)->systemResponse;
+
+    $chat->summary = $summary;
+    $chat->last_summarized_message_count = $currentMessageCount;
+    $chat->save();
+  }
+
+  private function formatMessagesForSummary(array $messages): string
+  {
+    return implode("\n", array_map(fn($message) => $message['role'] . ': ' . $message['content'], $messages));
   }
 
   private function generateChatTitle(array $messages): string

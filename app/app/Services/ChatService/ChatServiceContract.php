@@ -12,4 +12,6 @@ interface ChatServiceContract
   public function chatHistory(User $user): array;
 
   public function getChat(int $chatId): ?Chat;
+
+  public function summarizeChat(Chat $chat): void;
 }
