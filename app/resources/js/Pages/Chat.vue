@@ -50,6 +50,10 @@ const sendMessage = async () => {
   const userMessage = { content: newMessage.value, role: 'user' };
   messages.value.push(userMessage);
 
+  newMessage.value = '';
+  textAreaRef.value.style.height = 'auto';
+
+  await nextTick();
   scrollToBottom();
 
   const response = await axios.post('/chat', { 
@@ -63,13 +67,9 @@ const sendMessage = async () => {
   }
   chatId.value = response.data.chat.id;
   chatTitle.value = response.data.chat.title;
-
-  newMessage.value = '';
-  textAreaRef.value.style.height = 'auto';
   
-  nextTick(() => {
-    scrollToBottom();
-  });
+  await nextTick();
+  scrollToBottom();
   
   sendLoading.value = false;
 };
