@@ -30,6 +30,9 @@ const showingNavigationDropdown = ref(false);
                                 <NavLink :href="route('chat')" :active="route().current('chat')">
                                     Chat
                                 </NavLink>
+                                <NavLink :href="route('system-prompts')" :active="route().current('system-prompts')">
+                                    System Prompts
+                                </NavLink>
                             </div>
                         </div>
 
@@ -90,10 +93,11 @@ const showingNavigationDropdown = ref(false);
                         <ResponsiveNavLink :href="route('chat')" :active="route().current('chat')">
                             Chat
                         </ResponsiveNavLink>
-                    </div>
-                    <div class="pt-2 pb-3 space-y-1">
                         <ResponsiveNavLink :href="route('chat.history')" :active="route().current('chat.history')">
                             Chat History
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink :href="route('system-prompts')" :active="route().current('system-prompts')">
+                            System Prompts
                         </ResponsiveNavLink>
                     </div>
 
