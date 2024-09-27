@@ -1,7 +1,7 @@
 <script setup>
 import { Head } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { toRefs, ref } from 'vue';
+import { ref } from 'vue';
 import NewPromptModal from '@/Components/SystemPrompts/NewPromptModal.vue';
 import axios from 'axios';
 
@@ -12,25 +12,40 @@ const props = defineProps({
   }
 });
 
-const { prompts } = toRefs(props);
+const prompts = ref(props.prompts);
 const showModal = ref(false);
 const error = ref(false);
+const editingPrompt = ref(null);
 
-const addPrompt = async (newPrompt) => {
+const savePrompt = async (newPrompt) => {
   try {
     const response = await axios.post('/system-prompts', newPrompt);
     const savedPrompt = response.data;
     
-    prompts.value.unshift(savedPrompt);
+    const matchIndex = prompts.value.findIndex( p => p.id === savedPrompt.id);
 
-    showModal.value = false;
+    if (matchIndex > 0) {
+      prompts.value[matchIndex] = savedPrompt;
+    } else {
+      prompts.value.unshift(savedPrompt);
+    }
   } catch (err) {
-    error.value = err.response.data.message;
+    console.error({ err });
+
+    error.value = err.response.data.message;   
 
     setTimeout(() => {
       error.value = false;
     }, 5000);
   }
+
+  showModal.value = false;
+  editingPrompt.value = null;
+};
+
+const editPrompt = (prompt) => {
+  editingPrompt.value = prompt;
+  showModal.value = true;
 };
 </script>
 
@@ -50,12 +65,15 @@ const addPrompt = async (newPrompt) => {
         :key="prompt.id" 
         :class="['shadow-md rounded-lg p-4 mb-4', prompt.user_id === null ? 'bg-gray-100' : 'bg-white']"
       >
-        <h2 class="text-xl font-semibold">{{ prompt.name }}</h2>
+        <div class="flex items-center justify-between">
+          <h2 class="text-xl font-semibold">{{ prompt.name }}</h2>
+          <button v-if="prompt.user_id !== null" @click="editPrompt(prompt)" class="text-black hover:text-blue-500 px-4 py-2 rounded-lg mt-2">Edit</button>
+        </div>
         <p class="text-gray-700">{{ prompt.prompt }}</p>
       </div>
     </div>
     
-    <NewPromptModal v-if="showModal" @close="showModal = false" @save="addPrompt" />
+    <NewPromptModal v-if="showModal" :prompt="editingPrompt" @close="showModal = false" @save="savePrompt" />
   </AuthenticatedLayout>
 </template>
 

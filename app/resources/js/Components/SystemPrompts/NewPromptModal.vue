@@ -21,17 +21,33 @@
 </template>
 
 <script setup>
-import { ref, defineEmits } from 'vue';
+import { ref, defineEmits, defineProps } from 'vue';
+const props = defineProps({
+  prompt: Object,
+  default: null,
+  required: false,
+});
 
-const newPrompt = ref({ name: '', prompt: '' });
+const newPrompt = ref({ 
+  name: props.prompt?.name ?? '', 
+  prompt: props.prompt?.prompt ?? '', 
+});
 const emit = defineEmits(['close', 'save']);
 
 const savePrompt = () => {
-  emit('save', { ...newPrompt.value });
+  if (
+    newPrompt.value.name === props.prompt?.name && 
+    newPrompt.value.prompt === props.prompt?.prompt
+  ) {
+    emit('close');
+    return;
+  }
+
+  emit('save', { id: props.prompt?.id, ...newPrompt.value });
 
   newPrompt.value.name = '';
   newPrompt.value.prompt = '';
-  
+
   emit('close');
 };
 </script>
