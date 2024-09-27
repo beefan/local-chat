@@ -6,11 +6,13 @@ use App\Http\Controllers\Clients\ChatClientContract;
 use App\Jobs\SummarizeChat;
 use App\Models\Chat;
 use App\Models\User;
+use App\Services\SystemPromptService\SystemPromptServiceContract;
 
 class ChatService implements ChatServiceContract
 {
   public function __construct(
-    private readonly ChatClientContract $chatClient
+    private readonly ChatClientContract $chatClient,
+    private readonly SystemPromptServiceContract $systemPromptService,
   ) {}
 
   public function chat(array $messages, ?int $userId = null, ?int $chatId = null, ?string $systemPrompt = null): ChatResponse
@@ -18,9 +20,11 @@ class ChatService implements ChatServiceContract
     $chat = $chatId ? $this->getChat($chatId) : null;
     $saveMessages = $messages;
 
+    $systemPrompt = $systemPrompt ?? $chat?->systemPrompt?->prompt ?? $this->systemPromptService->default()->prompt;
+
     array_unshift($messages, [
       'role' => 'system',
-      'content' => $systemPrompt ?? config('chat.defaultSystemPrompt'),
+      'content' => $systemPrompt,
     ]);
 
     if ($chat) {

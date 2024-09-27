@@ -32,6 +32,14 @@ class SystemPromptService implements SystemPromptServiceContract
     ]);
   }
 
+  public function default(): SystemPrompt
+  {
+    return SystemPrompt::where([
+      'name' => 'default',
+      'user_id' => null,
+    ])->first();
+  }
+
   private function mergeGlobalPrompts(array $prompts): array
   {
     return array_merge($prompts, SystemPrompt::whereNull('user_id')->get()->toArray());

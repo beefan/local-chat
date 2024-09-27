@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * @property-read User $user
+ * @property-read ?SystemPrompt $systemPrompt
  */
 class Chat extends Model
 {
@@ -25,6 +26,11 @@ class Chat extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function systemPrompt(): BelongsTo
+    {
+        return $this->belongsTo(SystemPrompt::class);
     }
 
     public function lastMessages(?int $count = null): array
