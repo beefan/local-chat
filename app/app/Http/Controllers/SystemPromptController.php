@@ -24,6 +24,13 @@ class SystemPromptController extends Controller
         ]);
     }
 
+    public function get(Request $request): JsonResponse
+    {
+        $user = $request->user();
+        $prompts = $this->systemPromptService->systemPromptsForUser($user);
+        return response()->json($prompts);
+    }
+
     public function save(Request $request): JsonResponse
     {
         $request->validate([

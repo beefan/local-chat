@@ -15,7 +15,7 @@ class Chat extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['title', 'user_id'];
+    protected $fillable = ['title', 'user_id', 'system_prompt_id'];
     protected $hidden = ['user_id', 'summary', 'updated_at'];
 
     public function messages(): HasMany

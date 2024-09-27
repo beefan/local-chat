@@ -35,6 +35,15 @@ class ChatController extends Controller
     return response()->json($response);
   }
 
+  public function update(Chat $chat, Request $request): JsonResponse
+  {
+    $chat->update([
+      'system_prompt_id' => $request->input('systemPromptId'),
+    ]);
+
+    return response()->json();
+  }
+
   public function chatHistory(Request $request): Response
   {
     $user = $request->user();

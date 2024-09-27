@@ -25,8 +25,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/chat/{chat}', [ChatController::class, 'getChat'])->name('chat.get');
     Route::get('/chat', [ChatController::class, 'newChat'])->name('chat');
     Route::post('/chat', [ChatController::class, 'chat'])->name('chat.message');
+    Route::patch('/chat/{chat}', [ChatController::class, 'update'])->name('chat.update');
 
     Route::get('/system-prompts', [SystemPromptController::class, 'index'])->name('system-prompts');
+    Route::get('/system-prompts/get', [SystemPromptController::class, 'get'])->name('system-prompts.get');
     Route::post('/system-prompts', [SystemPromptController::class, 'save'])->name('system-prompts.save');
     Route::delete('/system-prompts/{systemPrompt}', [SystemPromptController::class, 'delete'])->name('system-prompts.delete');
 });
