@@ -53,6 +53,6 @@ class User extends Authenticatable
 
     public function systemPrompts(): HasMany
     {
-        return $this->hasMany(SystemPrompt::class);
+        return $this->hasMany(SystemPrompt::class)->orderBy('created_at', 'desc');
     }
 }

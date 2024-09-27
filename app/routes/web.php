@@ -27,6 +27,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/chat', [ChatController::class, 'chat'])->name('chat.message');
 
     Route::get('/system-prompts', [SystemPromptController::class, 'index'])->name('system-prompts');
+    Route::post('/system-prompts', [SystemPromptController::class, 'save'])->name('system-prompts.save');
 });
 
 require __DIR__ . '/auth.php';

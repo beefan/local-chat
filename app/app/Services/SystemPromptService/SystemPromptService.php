@@ -14,6 +14,14 @@ class SystemPromptService implements SystemPromptServiceContract
     return $this->mergeGlobalPrompts($userPrompts);
   }
 
+  public function save(string $name, string $prompt, User $user): SystemPrompt
+  {
+    return $user->systemPrompts()->create([
+      'name' => $name,
+      'prompt' => $prompt,
+    ]);
+  }
+
   private function mergeGlobalPrompts(array $prompts): array
   {
     return array_merge($prompts, SystemPrompt::whereNull('user_id')->get()->toArray());
