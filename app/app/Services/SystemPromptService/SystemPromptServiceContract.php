@@ -9,5 +9,5 @@ interface SystemPromptServiceContract
 {
   public function systemPromptsForUser(User $user): array;
 
-  public function save(string $name, string $prompt, User $user): SystemPrompt;
+  public function save(string $name, string $prompt, ?int $id, User $user): SystemPrompt;
 }
