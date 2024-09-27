@@ -17,6 +17,29 @@ const showModal = ref(false);
 const error = ref(false);
 const editingPrompt = ref(null);
 
+const closeModal = () => {
+  showModal.value = false;
+  editingPrompt.value = null;
+};
+
+const deletePrompt = async (promptId) => {
+  try {
+    await axios.delete(`/system-prompts/${promptId}`);
+    prompts.value = prompts.value.filter( p => p.id !== promptId);
+  } catch (err) {
+    console.error({ err });
+
+    error.value = err.response.data.message;   
+
+    setTimeout(() => {
+      error.value = false;
+    }, 5000);
+  }
+
+  showModal.value = false;
+  editingPrompt.value = null;
+};
+
 const savePrompt = async (newPrompt) => {
   try {
     const response = await axios.post('/system-prompts', newPrompt);
@@ -73,7 +96,7 @@ const editPrompt = (prompt) => {
       </div>
     </div>
     
-    <NewPromptModal v-if="showModal" :prompt="editingPrompt" @close="showModal = false" @save="savePrompt" />
+    <NewPromptModal v-if="showModal" :prompt="editingPrompt" @close="closeModal" @save="savePrompt" @delete="deletePrompt"/>
   </AuthenticatedLayout>
 </template>
 

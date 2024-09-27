@@ -12,6 +12,7 @@
           <textarea v-model="newPrompt.prompt" id="prompt" class="mt-1 p-2 border border-gray-300 rounded-md w-full" rows="10" required></textarea>
         </div>
         <div class="flex justify-end space-x-2">
+          <button v-if="props.prompt?.id" type="button" @click="deletePrompt" class="bg-red-500 text-white px-4 py-2 rounded-lg">Delete</button>
           <button type="button" @click="emit('close')" class="bg-gray-500 text-white px-4 py-2 rounded-lg">Cancel</button>
           <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg">Save</button>
         </div>
@@ -32,7 +33,16 @@ const newPrompt = ref({
   name: props.prompt?.name ?? '', 
   prompt: props.prompt?.prompt ?? '', 
 });
-const emit = defineEmits(['close', 'save']);
+const emit = defineEmits(['close', 'save', 'delete']);
+
+const deletePrompt = () => {
+  const confirmation = confirm('Are you sure you want to delete this prompt?');
+  if (confirmation) {
+    emit('delete', props.prompt?.id);
+  } else {
+    emit('close');
+  }
+};
 
 const savePrompt = () => {
   if (

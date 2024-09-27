@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\SystemPrompt;
 use App\Services\SystemPromptService\SystemPromptServiceContract;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -43,5 +44,12 @@ class SystemPromptController extends Controller
         );
 
         return response()->json($prompt);
+    }
+
+    public function delete(SystemPrompt $systemPrompt): JsonResponse
+    {
+        $systemPrompt->delete();
+
+        return response()->json();
     }
 }

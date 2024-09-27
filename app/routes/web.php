@@ -28,6 +28,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/system-prompts', [SystemPromptController::class, 'index'])->name('system-prompts');
     Route::post('/system-prompts', [SystemPromptController::class, 'save'])->name('system-prompts.save');
+    Route::delete('/system-prompts/{systemPrompt}', [SystemPromptController::class, 'delete'])->name('system-prompts.delete');
 });
 
 require __DIR__ . '/auth.php';
