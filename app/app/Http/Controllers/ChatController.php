@@ -26,11 +26,12 @@ class ChatController extends Controller
 
   public function chat(Request $request): JsonResponse
   {
-    $userId = $request->user()->id;
-    $chatId = $request->get('chatId');
-    $messages = $request->get('messages');
-
-    $response = $this->chatService->chat($messages, $userId, $chatId);
+    $response = $this->chatService->chat(
+      messages: $request->get('messages'),
+      userId: $request->user()->id,
+      chatId: $request->get('chatId'),
+      systemPromptId: $request->get('systemPromptId')
+    );
 
     return response()->json($response);
   }

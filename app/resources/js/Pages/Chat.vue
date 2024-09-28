@@ -62,7 +62,8 @@ const sendMessage = async () => {
 
   const response = await axios.post('/chat', { 
     messages: [userMessage], 
-    chatId: chatId.value
+    chatId: chatId.value,
+    systemPromptId: selectedSystemPrompt.value
   });
 
   messages.value.push({ content: response.data.systemResponse, role: 'assistant' });

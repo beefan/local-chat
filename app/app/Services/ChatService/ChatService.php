@@ -15,12 +15,21 @@ class ChatService implements ChatServiceContract
     private readonly SystemPromptServiceContract $systemPromptService,
   ) {}
 
-  public function chat(array $messages, ?int $userId = null, ?int $chatId = null, ?string $systemPrompt = null): ChatResponse
-  {
+  public function chat(
+    array $messages,
+    ?int $userId = null,
+    ?int $chatId = null,
+    ?string $systemPrompt = null,
+    ?int $systemPromptId = null
+  ): ChatResponse {
     $chat = $chatId ? $this->getChat($chatId) : null;
     $saveMessages = $messages;
 
-    $systemPrompt = $systemPrompt ?? $chat?->systemPrompt?->prompt ?? $this->systemPromptService->default()->prompt;
+    if ($systemPromptId && ! $chat?->systemPrompt) {
+      $systemPrompt = $this->systemPromptService->prompt($systemPromptId);
+    } else {
+      $systemPrompt = $systemPrompt ?? $chat?->systemPrompt?->prompt ?? $this->systemPromptService->default();
+    }
 
     array_unshift($messages, [
       'role' => 'system',
@@ -44,7 +53,7 @@ class ChatService implements ChatServiceContract
     ];
 
     if ($userId) {
-      $chat = $this->saveChat($userId, $saveMessages, $chat);
+      $chat = $this->saveChat($userId, $saveMessages, $chat, $systemPromptId);
     }
 
     return new ChatResponse(
@@ -58,7 +67,7 @@ class ChatService implements ChatServiceContract
     return $user->chats()->orderByDesc('created_at')->get()->toArray();
   }
 
-  private function saveChat(?int $userId, array $messages, ?Chat $chat): Chat
+  private function saveChat(?int $userId, array $messages, ?Chat $chat, ?int $systemPromptId): Chat
   {
     $messages = array_filter($messages, fn($message) => ! (empty($message['content']) || empty($message['role'])));
 
@@ -66,6 +75,7 @@ class ChatService implements ChatServiceContract
       $chat = Chat::create([
         'user_id' => $userId,
         'title' => $this->generateChatTitle($messages),
+        ...$systemPromptId ? ['system_prompt_id' => $systemPromptId] : [],
       ]);
     }
 

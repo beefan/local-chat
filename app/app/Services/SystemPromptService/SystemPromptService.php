@@ -32,12 +32,17 @@ class SystemPromptService implements SystemPromptServiceContract
     ]);
   }
 
-  public function default(): SystemPrompt
+  public function default(): string
   {
     return SystemPrompt::where([
       'name' => 'default',
       'user_id' => null,
-    ])->first();
+    ])->first()->prompt;
+  }
+
+  public function prompt(int $id): string
+  {
+    return SystemPrompt::findOrFail($id)->prompt;
   }
 
   private function mergeGlobalPrompts(array $prompts): array

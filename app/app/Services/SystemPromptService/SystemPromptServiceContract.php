@@ -11,5 +11,7 @@ interface SystemPromptServiceContract
 
   public function save(string $name, string $prompt, ?int $id, User $user): SystemPrompt;
 
-  public function default(): SystemPrompt;
+  public function default(): string;
+
+  public function prompt(int $id): string;
 }
