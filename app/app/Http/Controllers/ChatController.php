@@ -58,6 +58,7 @@ class ChatController extends Controller
     return Inertia::render('Chat', [
       'title' => $chat->title,
       'id' => $chat->id,
+      'systemPromptId' => $chat->system_prompt_id,
       'messageHistory' => $chat->messages()->get()->toArray(),
       'chatHistory' => fn() => $this->chatService->chatHistory($chat->user),
       'prioritizeHistory' => false,
