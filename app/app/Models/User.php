@@ -50,4 +50,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Chat::class);
     }
+
+    public function systemPrompts(): HasMany
+    {
+        return $this->hasMany(SystemPrompt::class)->orderBy('created_at', 'desc');
+    }
 }

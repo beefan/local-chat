@@ -26,13 +26,23 @@ class ChatController extends Controller
 
   public function chat(Request $request): JsonResponse
   {
-    $userId = $request->user()->id;
-    $chatId = $request->get('chatId');
-    $messages = $request->get('messages');
-
-    $response = $this->chatService->chat($messages, $userId, $chatId);
+    $response = $this->chatService->chat(
+      messages: $request->get('messages'),
+      userId: $request->user()->id,
+      chatId: $request->get('chatId'),
+      systemPromptId: $request->get('systemPromptId')
+    );
 
     return response()->json($response);
+  }
+
+  public function update(Chat $chat, Request $request): JsonResponse
+  {
+    $chat->update([
+      'system_prompt_id' => $request->input('systemPromptId'),
+    ]);
+
+    return response()->json();
   }
 
   public function chatHistory(Request $request): Response
@@ -49,6 +59,7 @@ class ChatController extends Controller
     return Inertia::render('Chat', [
       'title' => $chat->title,
       'id' => $chat->id,
+      'systemPromptId' => $chat->system_prompt_id,
       'messageHistory' => $chat->messages()->get()->toArray(),
       'chatHistory' => fn() => $this->chatService->chatHistory($chat->user),
       'prioritizeHistory' => false,

@@ -9,12 +9,13 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * @property-read User $user
+ * @property-read ?SystemPrompt $systemPrompt
  */
 class Chat extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['title', 'user_id'];
+    protected $fillable = ['title', 'user_id', 'system_prompt_id'];
     protected $hidden = ['user_id', 'summary', 'updated_at'];
 
     public function messages(): HasMany
@@ -25,6 +26,11 @@ class Chat extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function systemPrompt(): BelongsTo
+    {
+        return $this->belongsTo(SystemPrompt::class);
     }
 
     public function lastMessages(?int $count = null): array

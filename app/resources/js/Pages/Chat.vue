@@ -22,6 +22,10 @@ const props = defineProps({
     type: Number,
     required: false,
   },
+  systemPromptId: {
+    type: Number,
+    required: false,
+  },
   prioritizeHistory: {
     type: Boolean,
     required: false,
@@ -58,7 +62,8 @@ const sendMessage = async () => {
 
   const response = await axios.post('/chat', { 
     messages: [userMessage], 
-    chatId: chatId.value
+    chatId: chatId.value,
+    systemPromptId: selectedSystemPrompt.value
   });
 
   messages.value.push({ content: response.data.systemResponse, role: 'assistant' });
@@ -77,6 +82,35 @@ const sendMessage = async () => {
 const sendDisabled = computed(() => {
   return sendLoading.value || newMessage.value.trim().length < 1;
 });
+
+const systemPromptDropDown = ref(false);
+const selectedSystemPrompt = ref(null);
+const systemPrompts = ref([]);
+
+const toggleSystemPromptDropDown = () => {
+  systemPromptDropDown.value = !systemPromptDropDown.value;
+};
+const applyPrompt = async () => {
+  if (! chatId.value || ! selectedSystemPrompt.value) {
+    return;
+  }
+
+  await axios.patch(`/chat/${chatId.value}`, { 
+    systemPromptId: selectedSystemPrompt.value
+  });
+};
+
+const loadSystemPrompts = async () => {
+  const response = await axios.get('/system-prompts/get');
+  systemPrompts.value = response.data;
+  
+  if (props.systemPromptId) {
+    selectedSystemPrompt.value = systemPrompts.value.find(p => p.id === props.systemPromptId)?.id;
+  } else 
+  {
+    selectedSystemPrompt.value = systemPrompts.value.find(p => p.name === 'default')?.id;
+  }
+};
 
 const screenIsSmall = ref(computed(() => window.innerWidth < 640));
 
@@ -105,6 +139,7 @@ provide('prioritizeHistory', props.prioritizeHistory);
 
 onMounted(() => {
   scrollToBottom();
+  loadSystemPrompts();
 });
 </script>
 
@@ -112,7 +147,22 @@ onMounted(() => {
   <Head title="Chat" />
 
   <AuthenticatedLayout>
-    <h1 v-if="! props.prioritizeHistory" class="flex justify-center items-center pt-2 text-lg">{{ chatTitle }}</h1>    
+    <div v-if="! props.prioritizeHistory" class="flex justify-end items-end">
+      <div class="flex justify-center w-3/4">
+        <h1 class="pt-2 text-lg">{{ chatTitle }}</h1>    
+      </div>
+      <div class="flex flex-col w-1/2 md:w-1/4 lg:w-1/4">
+        <button @click="toggleSystemPromptDropDown" class="text-gray-700 hover:text-blue-500 px-4 py-2 rounded-lg text-sm">
+          set system prompt
+        </button>
+        <div v-if="systemPromptDropDown" class="mt-2 w-48 bg-white border border-gray-300 rounded-lg shadow-lg">
+          <select v-model="selectedSystemPrompt" @change="applyPrompt" class="w-full p-2 border border-gray-300 rounded-lg">
+            <option v-for="prompt in systemPrompts" :key="prompt.id" :value="prompt.id">{{ prompt.name }}</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
     <div class='py-6 flex'>
       <ChatHistory :chats="chatHistory" :current="chatId"/>
       
